@@ -1,0 +1,8 @@
+# robots.txt für autobaer.ch
+# Alle Suchmaschinen sind willkommen
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://autobaer.ch/sitemap.xml

@@ -209,6 +209,12 @@
       align-items: center;
       gap: 0.75rem;
     }
+    /* Hero eyebrow slightly larger to fit rotating city names */
+    .hero .eyebrow {
+      font-size: 0.875rem;
+      letter-spacing: 0.18em;
+      flex-wrap: wrap;
+    }
     .eyebrow::before {
       content: '';
       width: 1.75rem;
@@ -221,15 +227,16 @@
     .rotating-location {
       position: relative;
       display: inline-block;
-      min-width: 9.5em;
-      height: 1.1em;
+      min-width: 3.5em;
+      height: 1.4em;
       vertical-align: bottom;
       overflow: hidden;
+      transition: width 0.5s ease;
     }
     .rotating-word {
       position: absolute;
       left: 0;
-      top: 0;
+      top: 0.15em;
       white-space: nowrap;
       opacity: 0;
       transform: translateY(100%);
@@ -1682,7 +1689,7 @@
         <div class="hero-content">
           <span class="eyebrow fade-in">
             <span data-de="Auto Ankauf in" data-fr="Achat de voitures à">Auto Ankauf in</span>
-            <span class="rotating-location" id="rotatingLocation" aria-hidden="true">
+            <span class="rotating-location" id="rotatingLocation" aria-hidden="true" style="width:3.5em">
               <span class="rotating-word active">Thun</span>
             </span>
           </span>
@@ -2532,16 +2539,39 @@
       const locations = ['Thun', 'Kanton Bern', 'Berner Oberland', 'Spiez', 'Steffisburg', 'Interlaken', 'Frutigen'];
       let index = 0;
 
+      // Helper to measure a word's width using a hidden span
+      function measureWidth(text) {
+        const probe = document.createElement('span');
+        probe.style.position = 'absolute';
+        probe.style.visibility = 'hidden';
+        probe.style.whiteSpace = 'nowrap';
+        probe.style.font = window.getComputedStyle(container).font;
+        probe.style.letterSpacing = window.getComputedStyle(container).letterSpacing;
+        probe.textContent = text;
+        document.body.appendChild(probe);
+        const w = probe.getBoundingClientRect().width;
+        document.body.removeChild(probe);
+        return w;
+      }
+
+      // Set initial width to the first word
+      function setWidth(text) {
+        container.style.width = Math.ceil(measureWidth(text)) + 2 + 'px';
+      }
+      setWidth(locations[0]);
+
       function rotate() {
         const current = container.querySelector('.rotating-word.active');
         index = (index + 1) % locations.length;
+
+        // Resize the container to fit the next word
+        setWidth(locations[index]);
 
         const next = document.createElement('span');
         next.className = 'rotating-word';
         next.textContent = locations[index];
         container.appendChild(next);
 
-        // Force reflow so the transition triggers
         void next.offsetWidth;
 
         if (current) {
@@ -2550,7 +2580,6 @@
         }
         next.classList.add('active');
 
-        // Clean up the old word after the transition
         setTimeout(() => {
           if (current && current.parentNode) current.parentNode.removeChild(current);
         }, 600);

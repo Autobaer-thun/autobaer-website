@@ -217,6 +217,34 @@
       display: inline-block;
     }
 
+    /* Rotating location in hero eyebrow */
+    .rotating-location {
+      position: relative;
+      display: inline-block;
+      min-width: 9.5em;
+      height: 1.1em;
+      vertical-align: bottom;
+      overflow: hidden;
+    }
+    .rotating-word {
+      position: absolute;
+      left: 0;
+      top: 0;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(100%);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      color: var(--accent);
+    }
+    .rotating-word.active {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .rotating-word.exit {
+      opacity: 0;
+      transform: translateY(-100%);
+    }
+
     /* NAV */
     nav.main-nav {
       position: fixed;
@@ -1652,8 +1680,11 @@
     <div class="container">
       <div class="hero-grid">
         <div class="hero-content">
-          <span class="eyebrow fade-in" data-de="Auto Ankauf · Thun · Berner Oberland" data-fr="Achat de voitures · Thun · Oberland bernois">
-            Auto Ankauf · Thun · Berner Oberland
+          <span class="eyebrow fade-in">
+            <span data-de="Auto Ankauf in" data-fr="Achat de voitures à">Auto Ankauf in</span>
+            <span class="rotating-location" id="rotatingLocation" aria-hidden="true">
+              <span class="rotating-word active">Thun</span>
+            </span>
           </span>
 
           <h1 class="fade-in delay-1">
@@ -1664,8 +1695,8 @@
             <span class="light" data-de="unkompliziert." data-fr="sans détours.">unkompliziert.</span>
           </h1>
 
-          <p class="hero-subtitle fade-in delay-2" data-de="AutoBär kauft Ihr Fahrzeug in Thun und im ganzen Berner Oberland. Alle Marken, alle Modelle, alle Zustände. Kostenlose Bewertung, sofortige Bezahlung." data-fr="AutoBär achète votre véhicule à Thun et dans tout l'Oberland bernois. Toutes les marques, tous les modèles, tous les états. Évaluation gratuite, paiement immédiat.">
-            AutoBär kauft Ihr Fahrzeug in Thun und im ganzen Berner Oberland. Alle Marken, alle Modelle, alle Zustände. Kostenlose Bewertung, sofortige Bezahlung.
+          <p class="hero-subtitle fade-in delay-2" data-de="AutoBär Thun kauft Ihr Fahrzeug in Thun und im ganzen Berner Oberland. Alle Marken, alle Modelle, alle Zustände. Kostenlose Bewertung, sofortige Bezahlung." data-fr="AutoBär Thun achète votre véhicule à Thun et dans tout l'Oberland bernois. Toutes les marques, tous les modèles, tous les états. Évaluation gratuite, paiement immédiat.">
+            AutoBär Thun kauft Ihr Fahrzeug in Thun und im ganzen Berner Oberland. Alle Marken, alle Modelle, alle Zustände. Kostenlose Bewertung, sofortige Bezahlung.
           </p>
 
           <div class="hero-cta fade-in delay-3">
@@ -2007,8 +2038,8 @@
           <span data-de="Egal welches Fahrzeug —" data-fr="Peu importe le véhicule —">Egal welches Fahrzeug —</span>
           <em data-de="wir machen Ihnen ein Angebot." data-fr="nous vous faisons une offre.">wir machen Ihnen ein Angebot.</em>
         </h2>
-        <p data-de="Ob neu oder alt, gepflegt oder beschädigt, sportlich oder praktisch — bei AutoBär sind alle Fahrzeuge willkommen." data-fr="Neuve ou ancienne, soignée ou endommagée, sportive ou pratique — chez AutoBär, tous les véhicules sont bienvenus.">
-          Ob neu oder alt, gepflegt oder beschädigt, sportlich oder praktisch — bei AutoBär sind alle Fahrzeuge willkommen.
+        <p data-de="Ob neu oder alt, gepflegt oder beschädigt, sportlich oder praktisch — bei AutoBär Thun sind alle Fahrzeuge willkommen." data-fr="Neuve ou ancienne, soignée ou endommagée, sportive ou pratique — chez AutoBär Thun, tous les véhicules sont bienvenus.">
+          Ob neu oder alt, gepflegt oder beschädigt, sportlich oder praktisch — bei AutoBär Thun sind alle Fahrzeuge willkommen.
         </p>
       </div>
 
@@ -2494,6 +2525,40 @@
   </footer>
 
   <script>
+    // ========== ROTATING LOCATION IN HERO ==========
+    (function() {
+      const container = document.getElementById('rotatingLocation');
+      if (!container) return;
+      const locations = ['Thun', 'Kanton Bern', 'Berner Oberland', 'Spiez', 'Steffisburg', 'Interlaken', 'Frutigen'];
+      let index = 0;
+
+      function rotate() {
+        const current = container.querySelector('.rotating-word.active');
+        index = (index + 1) % locations.length;
+
+        const next = document.createElement('span');
+        next.className = 'rotating-word';
+        next.textContent = locations[index];
+        container.appendChild(next);
+
+        // Force reflow so the transition triggers
+        void next.offsetWidth;
+
+        if (current) {
+          current.classList.remove('active');
+          current.classList.add('exit');
+        }
+        next.classList.add('active');
+
+        // Clean up the old word after the transition
+        setTimeout(() => {
+          if (current && current.parentNode) current.parentNode.removeChild(current);
+        }, 600);
+      }
+
+      setInterval(rotate, 2200);
+    })();
+
     const nav = document.getElementById('mainNav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', window.scrollY > 20);

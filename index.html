@@ -223,33 +223,15 @@
       display: inline-block;
     }
 
-    /* Rotating location in hero eyebrow */
-    .rotating-location {
-      position: relative;
-      display: inline-block;
-      min-width: 3.5em;
-      height: 1.4em;
-      vertical-align: bottom;
-      overflow: hidden;
-      transition: width 0.5s ease;
-    }
+    /* Rotating location in hero eyebrow — simple inline text, fades between cities */
     .rotating-word {
-      position: absolute;
-      left: 0;
-      top: 0.15em;
-      white-space: nowrap;
-      opacity: 0;
-      transform: translateY(100%);
-      transition: opacity 0.5s ease, transform 0.5s ease;
       color: var(--accent);
+      display: inline-block;
+      transition: opacity 0.3s ease, transform 0.3s ease;
     }
-    .rotating-word.active {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .rotating-word.exit {
+    .rotating-word.fading {
       opacity: 0;
-      transform: translateY(-100%);
+      transform: translateY(-4px);
     }
 
     /* NAV */
@@ -1091,38 +1073,19 @@
     }
     .map-placeholder {
       aspect-ratio: 16/10;
-      background:
-        linear-gradient(135deg, rgba(176, 122, 43, 0.1), transparent),
-        var(--bg-card);
       border: 1px solid var(--border);
       border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       position: relative;
       overflow: hidden;
       box-shadow: var(--shadow);
+      background: var(--bg-card);
     }
-    .map-placeholder::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(176, 122, 43, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(176, 122, 43, 0.08) 1px, transparent 1px);
-      background-size: 32px 32px;
+    .map-placeholder iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
     }
-    .map-pin {
-      position: relative;
-      z-index: 1;
-      color: var(--accent);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .map-pin svg { width: 32px; height: 32px; }
-    .map-pin span { font-size: 0.875rem; font-weight: 600; }
 
     /* FOOTER */
     footer {
@@ -1369,6 +1332,13 @@
     }
     @media (max-width: 480px) {
       .valuation-form .valuation-fields { grid-template-columns: 1fr; }
+      /* Keep hero eyebrow on one line, smaller, so rotating cities fit */
+      .hero .eyebrow {
+        font-size: 0.6875rem;
+        letter-spacing: 0.12em;
+        gap: 0.5rem;
+      }
+      .hero .eyebrow::before { width: 1.25rem; }
     }
 
     /* ============ FLOATING WHATSAPP BUTTON ============ */
@@ -1689,9 +1659,7 @@
         <div class="hero-content">
           <span class="eyebrow fade-in">
             <span data-de="Auto Ankauf in" data-fr="Achat de voitures à">Auto Ankauf in</span>
-            <span class="rotating-location" id="rotatingLocation" aria-hidden="true" style="width:3.5em">
-              <span class="rotating-word active">Thun</span>
-            </span>
+            <span class="rotating-word" id="rotatingWord">Thun</span>
           </span>
 
           <h1 class="fade-in delay-1">
@@ -2072,12 +2040,12 @@
     <div class="container">
       <div class="about-grid">
         <div class="about-text fade-in">
-          <span class="eyebrow" data-de="Über AutoBär" data-fr="À propos d'AutoBär">Über AutoBär</span>
+          <span class="eyebrow" data-de="Über AutoBär Thun" data-fr="À propos d'AutoBär Thun">Über AutoBär Thun</span>
           <p class="lead" style="margin-top: 1.5rem;" data-de="Im Berner Oberland verwurzelt. Der Bär steht für Stärke, Verlässlichkeit und ein Wort, auf das man bauen kann." data-fr="Enraciné dans l'Oberland bernois. L'ours symbolise la force, la fiabilité et une parole sur laquelle on peut compter.">
             Im Berner Oberland verwurzelt. Der Bär steht für Stärke, Verlässlichkeit und ein Wort, auf das man bauen kann.
           </p>
-          <p data-de="AutoBär wurde aus einer einfachen Überzeugung heraus gegründet: Wer sein Auto verkaufen möchte, verdient einen ehrlichen Partner. Keine Tricks, keine Hinhaltetaktik, keine versteckten Abzüge." data-fr="AutoBär a été fondé sur une conviction simple : ceux qui veulent vendre leur voiture méritent un partenaire honnête. Pas d'astuces, pas de tactiques dilatoires, pas de déductions cachées.">
-            AutoBär wurde aus einer einfachen Überzeugung heraus gegründet: Wer sein Auto verkaufen möchte, verdient einen ehrlichen Partner. Keine Tricks, keine Hinhaltetaktik, keine versteckten Abzüge.
+          <p data-de="AutoBär Thun wurde aus einer einfachen Überzeugung heraus gegründet: Wer sein Auto verkaufen möchte, verdient einen ehrlichen Partner. Keine Tricks, keine Hinhaltetaktik, keine versteckten Abzüge." data-fr="AutoBär Thun a été fondé sur une conviction simple : ceux qui veulent vendre leur voiture méritent un partenaire honnête. Pas d'astuces, pas de tactiques dilatoires, pas de déductions cachées.">
+            AutoBär Thun wurde aus einer einfachen Überzeugung heraus gegründet: Wer sein Auto verkaufen möchte, verdient einen ehrlichen Partner. Keine Tricks, keine Hinhaltetaktik, keine versteckten Abzüge.
           </p>
           <p data-de="Wir sind ortsansässig in Thun und betreuen Kundinnen und Kunden aus dem gesamten Berner Oberland — von Spiez bis Interlaken, von Steffisburg bis Frutigen. Persönlich. Schnell. Fair." data-fr="Nous sommes basés à Thun et servons des clients de tout l'Oberland bernois — de Spiez à Interlaken, de Steffisburg à Frutigen. Personnel. Rapide. Équitable.">
             Wir sind ortsansässig in Thun und betreuen Kundinnen und Kunden aus dem gesamten Berner Oberland — von Spiez bis Interlaken, von Steffisburg bis Frutigen. Persönlich. Schnell. Fair.
@@ -2457,10 +2425,12 @@
           </div>
 
           <div class="map-placeholder fade-in delay-2">
-            <div class="map-pin">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
-              <span>Gwatt, Thun</span>
-            </div>
+            <iframe
+              title="AutoBär Thun - Gwattstrasse 141, 3645 Gwatt"
+              src="https://maps.google.com/maps?q=Gwattstrasse%20141%2C%203645%20Gwatt%2C%20Schweiz&t=&z=15&ie=UTF8&iwloc=&output=embed"
+              width="100%" height="100%" style="border:0; display:block;"
+              loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen></iframe>
           </div>
         </div>
       </div>
@@ -2534,58 +2504,19 @@
   <script>
     // ========== ROTATING LOCATION IN HERO ==========
     (function() {
-      const container = document.getElementById('rotatingLocation');
-      if (!container) return;
+      const word = document.getElementById('rotatingWord');
+      if (!word) return;
       const locations = ['Thun', 'Kanton Bern', 'Berner Oberland', 'Spiez', 'Steffisburg', 'Interlaken', 'Frutigen'];
       let index = 0;
 
-      // Helper to measure a word's width using a hidden span
-      function measureWidth(text) {
-        const probe = document.createElement('span');
-        probe.style.position = 'absolute';
-        probe.style.visibility = 'hidden';
-        probe.style.whiteSpace = 'nowrap';
-        probe.style.font = window.getComputedStyle(container).font;
-        probe.style.letterSpacing = window.getComputedStyle(container).letterSpacing;
-        probe.textContent = text;
-        document.body.appendChild(probe);
-        const w = probe.getBoundingClientRect().width;
-        document.body.removeChild(probe);
-        return w;
-      }
-
-      // Set initial width to the first word
-      function setWidth(text) {
-        container.style.width = Math.ceil(measureWidth(text)) + 2 + 'px';
-      }
-      setWidth(locations[0]);
-
-      function rotate() {
-        const current = container.querySelector('.rotating-word.active');
-        index = (index + 1) % locations.length;
-
-        // Resize the container to fit the next word
-        setWidth(locations[index]);
-
-        const next = document.createElement('span');
-        next.className = 'rotating-word';
-        next.textContent = locations[index];
-        container.appendChild(next);
-
-        void next.offsetWidth;
-
-        if (current) {
-          current.classList.remove('active');
-          current.classList.add('exit');
-        }
-        next.classList.add('active');
-
+      setInterval(() => {
+        word.classList.add('fading');
         setTimeout(() => {
-          if (current && current.parentNode) current.parentNode.removeChild(current);
-        }, 600);
-      }
-
-      setInterval(rotate, 2200);
+          index = (index + 1) % locations.length;
+          word.textContent = locations[index];
+          word.classList.remove('fading');
+        }, 300);
+      }, 2500);
     })();
 
     const nav = document.getElementById('mainNav');

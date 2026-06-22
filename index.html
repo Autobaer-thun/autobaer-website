@@ -304,6 +304,7 @@
       display: flex;
       align-items: center;
       gap: 1.5rem;
+      flex-shrink: 0;
     }
 
     .lang-toggle {
@@ -1339,6 +1340,14 @@
         gap: 0.5rem;
       }
       .hero .eyebrow::before { width: 1.25rem; }
+
+      /* Logo: smaller on phones so it doesn't crowd the DE/FR toggle */
+      .logo-img { height: 34px; }
+      .logo { gap: 0.4rem; }
+      .logo span { font-size: 1.15rem; }
+      .nav-right { gap: 0.5rem; }
+      .lang-toggle button { padding: 0.3rem 0.4rem; }
+      .nav-inner { gap: 0.5rem; }
     }
 
     /* ============ FLOATING WHATSAPP BUTTON ============ */

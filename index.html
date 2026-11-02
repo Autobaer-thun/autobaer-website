@@ -1595,6 +1595,17 @@
       color: #A8D88A;
       border-color: rgba(127, 176, 105, 0.35);
     }
+    /* Invalid phone number highlight */
+    .phone-invalid,
+    .phone-invalid:focus {
+      border-color: #C9472B !important;
+      box-shadow: 0 0 0 3px rgba(201, 71, 43, 0.18) !important;
+    }
+    .valuation-form .phone-invalid,
+    .valuation-form .phone-invalid:focus {
+      border-color: #FF9B85 !important;
+      box-shadow: 0 0 0 3px rgba(255, 120, 100, 0.22) !important;
+    }
     .valuation-form .form-status.error {
       background: rgba(255, 120, 100, 0.15);
       color: #FF9B85;
@@ -1855,7 +1866,7 @@
               <input type="text" name="modell" placeholder="Modell" data-de-placeholder="Modell (z.B. X3)" data-fr-placeholder="Modèle (ex. X3)" required>
               <input type="number" name="baujahr" placeholder="Baujahr" data-de-placeholder="Baujahr" data-fr-placeholder="Année" min="1950" max="2026" required>
               <input type="number" name="km" placeholder="Kilometer" data-de-placeholder="Kilometer" data-fr-placeholder="Kilométrage" min="0" required>
-              <input type="tel" name="telefon" placeholder="Telefon" data-de-placeholder="Telefon" data-fr-placeholder="Téléphone" required>
+              <input type="tel" name="telefon" class="phone-input" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="Telefon (z.B. 079 123 45 67)" data-de-placeholder="Telefon (z.B. 079 123 45 67)" data-fr-placeholder="Téléphone (ex. 079 123 45 67)" required>
             </div>
             <button type="submit" class="btn" id="valSubmitBtn">
               <span class="btn-label" data-de="Kostenlose Bewertung erhalten" data-fr="Obtenir une évaluation gratuite">Kostenlose Bewertung erhalten</span>
@@ -2352,7 +2363,7 @@
             </div>
             <div class="form-group">
               <label for="phone" data-de="Telefon" data-fr="Téléphone">Telefon</label>
-              <input type="tel" id="phone" name="phone" required>
+              <input type="tel" id="phone" name="phone" class="phone-input" inputmode="tel" autocomplete="tel" maxlength="20" placeholder="z.B. 079 123 45 67" data-de-placeholder="z.B. 079 123 45 67" data-fr-placeholder="ex. 079 123 45 67" required>
             </div>
           </div>
 
@@ -2691,6 +2702,10 @@
         de: 'Bitte füllen Sie alle Pflichtfelder aus.',
         fr: 'Veuillez remplir tous les champs obligatoires.'
       },
+      phone: {
+        de: 'Bitte geben Sie eine gültige Telefonnummer ein, z.B. 079 123 45 67 oder +41 79 123 45 67.',
+        fr: 'Veuillez saisir un numéro de téléphone valide, ex. 079 123 45 67 ou +41 79 123 45 67.'
+      },
       sending: {
         de: 'Wird gesendet …',
         fr: 'Envoi en cours …'
@@ -2717,6 +2732,52 @@
       }
     }
 
+    // ========== PHONE VALIDATION ==========
+    // Accepts Swiss numbers in any common notation and returns them formatted
+    // as "+41 79 123 45 67". Foreign numbers (+49, +33, ...) are accepted with
+    // 8-15 digits. Returns null if the input is not a plausible phone number.
+    function normalizePhone(raw) {
+      let s = String(raw).trim();
+      const hasPlus = s.startsWith('+');
+      let d = s.replace(/\D/g, '');
+      if (hasPlus) d = '+' + d;
+      else if (d.startsWith('00')) d = '+' + d.slice(2);
+
+      let national = null;
+      if (d.startsWith('+41')) {
+        national = d.slice(3);
+        if (national.startsWith('0')) national = national.slice(1); // "+41 079..." → drop extra 0
+      } else if (d.startsWith('0') && !d.startsWith('+')) {
+        national = d.slice(1);
+      }
+
+      if (national !== null) {
+        // Swiss: exactly 9 digits after the 0 / +41, not starting with 0
+        if (!/^[1-9]\d{8}$/.test(national)) return null;
+        return '+41 ' + national.slice(0, 2) + ' ' + national.slice(2, 5) + ' ' +
+               national.slice(5, 7) + ' ' + national.slice(7, 9);
+      }
+
+      if (d.startsWith('+')) {
+        const digits = d.slice(1);
+        if (/^[1-9]\d{7,14}$/.test(digits)) return d; // other countries
+      }
+      return null;
+    }
+
+    document.querySelectorAll('.phone-input').forEach(inp => {
+      // Only allow digits, +, spaces and common separators (blocks plates like "BE 123456")
+      inp.addEventListener('input', () => {
+        const cleaned = inp.value.replace(/[^\d+\s\-/().]/g, '');
+        if (cleaned !== inp.value) inp.value = cleaned;
+        inp.classList.remove('phone-invalid');
+      });
+      // Show red border as soon as the customer leaves the field with a wrong number
+      inp.addEventListener('blur', () => {
+        if (inp.value.trim() && !normalizePhone(inp.value)) inp.classList.add('phone-invalid');
+      });
+    });
+
     async function handleFormSubmit(form, btn, statusEl) {
       const lang = document.documentElement.lang;
 
@@ -2729,6 +2790,19 @@
           inp.focus();
           return;
         }
+      }
+
+      // Validate + normalize phone number
+      const phoneInp = form.querySelector('.phone-input');
+      if (phoneInp) {
+        const normalized = normalizePhone(phoneInp.value);
+        if (!normalized) {
+          phoneInp.classList.add('phone-invalid');
+          showStatus(statusEl, 'phone', lang);
+          phoneInp.focus();
+          return;
+        }
+        phoneInp.value = normalized; // you always receive the number in the same clean format
       }
 
       setLoading(btn, true);
